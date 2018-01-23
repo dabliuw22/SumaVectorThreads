@@ -4,10 +4,23 @@ import com.leysoft.sumavector.resorces.Recurso;
 import com.leysoft.sumavector.threads.Worker;
 
 public class App {
+	
+	private static final int NUM_HILOS = 4;
+	
+	private static final int SALTO = 4;
+	
+	private static int[] ARRAY = new int[NUM_HILOS*SALTO];
+	
+	public static void llenarArray() {
+		for(int i = 0; i < NUM_HILOS*SALTO; i++) {
+			ARRAY[i] = i;
+		}
+	}
+	
     public static void main( String[] args ) {
-    	final int NUM_HILOS = 3;
         Thread[] hilos = new Thread[NUM_HILOS];
-        Recurso recurso = new Recurso(new int[] {1, 2, 3, 4, 5, 6});
+        llenarArray();
+        Recurso recurso = new Recurso(ARRAY);
     	
         for(int i = 0; i < NUM_HILOS; i++) {
         	hilos[i] = new Thread(new Worker(i*recurso.getArray().length/NUM_HILOS, 
