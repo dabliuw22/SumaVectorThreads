@@ -1,67 +1,28 @@
 package com.leysoft.sumavector;
 
-import com.leysoft.sumavector.resorces.Recurso;
-import com.leysoft.sumavector.threads.Worker;
-import com.leysoft.sumavector.threads.WorkerParallel;
+import java.util.Random;
+
+import com.leysoft.sumavector.logics.SumaParalela;
+import com.leysoft.sumavector.logics.SumaSecuencial;
 
 public class App {
 	
-	private static final int NUM_HILOS = 4;
-	
-	private static final int SALTO = 100;
-	
-	private static int[] ARRAY = new int[NUM_HILOS*SALTO];
-	
-	public static void llenarArray() {
+    public static void main( String[] args ) {
+    	int NUM_HILOS = Runtime.getRuntime().availableProcessors();
+    	int SALTO = 100000;
+    	int[] ARRAY = new int[NUM_HILOS*SALTO];
+    	llenarArray(NUM_HILOS, ARRAY, SALTO);
+		long start = System.currentTimeMillis();
+		SumaSecuencial secuencial = new SumaSecuencial(ARRAY);
+		System.out.println("Secuencial suma() = "+ secuencial.suma() +", time = " + (System.currentTimeMillis() - start) + "mseg");
+    	SumaParalela paralela = new SumaParalela(ARRAY, NUM_HILOS);
+    	System.out.println("Parallel suma() = "+ paralela.suma() +", time = " + (System.currentTimeMillis() - start) + "mseg");
+    }
+    
+    public static void llenarArray(int NUM_HILOS, int[] ARRAY, int SALTO) {
+		Random random = new Random();
 		for(int i = 0; i < NUM_HILOS*SALTO; i++) {
-			ARRAY[i] = i;
+			ARRAY[i] = random.nextInt(100) + 1;
 		}
 	}
-	
-    public static void main( String[] args ) {
-        Thread[] hilosEM = new Thread[NUM_HILOS];
-        Thread[] hilosP = new Thread[NUM_HILOS];
-        llenarArray();
-        Recurso recurso = new Recurso(ARRAY);
-    	
-        /* INICIO EXCLUSIÓN MUTUA */
-        for(int i = 0; i < NUM_HILOS; i++) {
-        	hilosEM[i] = new Thread(new Worker(i*recurso.getArray().length/NUM_HILOS, 
-        			i*recurso.getArray().length/NUM_HILOS + recurso.getArray().length/NUM_HILOS, recurso), 
-        			"hiloEM[" + Integer.toString(i) + "]");
-        }
-        
-        for(int i = 0; i < NUM_HILOS; i++) {
-        	hilosEM[i].start();
-        }
-        /* FIN EXCLUSIÓN MUTUA */
-        
-        /* INICIO EJECUCIÓN PARALELA */
-        for(int i = 0; i < NUM_HILOS; i++) {
-        	hilosP[i] = new WorkerParallel(ARRAY, i*ARRAY.length/NUM_HILOS, 
-        			i*ARRAY.length/NUM_HILOS + ARRAY.length/NUM_HILOS, "hiloP[" + Integer.toString(i) + "]");
-        }
-        
-        for(int i = 0; i < NUM_HILOS; i++) {
-        	hilosP[i].start();
-        }
-        
-        /* FIN EJECUCIÓN PARALELA */
-        
-        for(int i = 0; i < NUM_HILOS; i++) {
-        	try {
-				hilosEM[i].join();
-				hilosP[i].join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-        }
-        
-        int suma = 0;
-        for(int i = 0; i < NUM_HILOS; i++) {
-        	suma += ((WorkerParallel) hilosP[i]).getSuma();
-        }
-        System.out.println("Parallel: suma() = " + suma);
-        System.out.println("Resource: suma() = " + recurso.getSuma());
-    }
 }

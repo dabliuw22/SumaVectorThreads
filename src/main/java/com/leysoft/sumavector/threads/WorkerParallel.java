@@ -28,6 +28,6 @@ public class WorkerParallel extends Thread {
 		for(int i = this.inicio; i < this.fin; i++) {
 			this.suma += this.array[i];
 		}
-		System.out.println("PARAREL -> suma("+ this.inicio +", "+ this.fin +")..." + Thread.currentThread().getName());
+		System.out.println("suma("+ this.inicio +", "+ this.fin +")... " + Thread.currentThread().getName());
 	}
 }
