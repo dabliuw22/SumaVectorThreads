@@ -11,7 +11,7 @@ public class WorkerParallel extends Thread {
 		super(nombre);
 		this.array = array;
 		this.inicio = inicio;
-		this.fin = fin;
+		this.fin = Math.min(fin, array.length);
 		this.suma = 0;
 	}
 

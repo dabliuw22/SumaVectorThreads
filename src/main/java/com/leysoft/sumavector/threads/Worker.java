@@ -14,7 +14,7 @@ public class Worker implements Runnable {
 
 	public Worker(int inicio, int fin, Recurso recurso) {
 		this.inicio = inicio;
-		this.fin = fin;
+		this.fin = Math.min(fin, recurso.getArray().length);;
 		this.recurso = recurso;
 	}
 

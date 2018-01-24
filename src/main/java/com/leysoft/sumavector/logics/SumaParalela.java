@@ -4,23 +4,21 @@ import com.leysoft.sumavector.threads.WorkerParallel;
 
 public class SumaParalela {
 	
-	private int[] array;
+	private WorkerParallel[] hilos;
 	
 	private int NUM_HILOS;
 	
-	public SumaParalela(int[] array, int NUM_HILOS) {
-		this.array = array;
+	public SumaParalela(int NUM_HILOS) {
 		this.NUM_HILOS = NUM_HILOS;
+		this.hilos = new WorkerParallel[NUM_HILOS];
 	}
 
-	public int suma() {
+	public int suma(int[] array) {
 		int suma = 0;
-		WorkerParallel[] hilos = new WorkerParallel[NUM_HILOS];
-		
+		int size = (int) Math.ceil(array.length*1.0/NUM_HILOS);
 		for(int i = 0; i < NUM_HILOS; i++) {
-        	hilos[i] = new WorkerParallel(array, i*array.length/NUM_HILOS, 
-        			i*array.length/NUM_HILOS + array.length/NUM_HILOS, "hilo[" + Integer.toString(i) + "]");
-        	hilos[i].start();
+        	this.hilos[i] = new WorkerParallel(array, i*size, size*(i + 1), "hilo[" + Integer.toString(i) + "]");
+        	this.hilos[i].start();
         }
         
         for(int i = 0; i < NUM_HILOS; i++) {
